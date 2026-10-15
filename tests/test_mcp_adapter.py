@@ -43,3 +43,14 @@ def test_mcp_adapter_search_rentals() -> None:
     result_dict = adapter.search_rentals(city="Timóteo", bedrooms=2, max_price=1500.0)
     assert isinstance(result_dict, dict)
     assert "listings" in result_dict
+
+
+def test_detail_parser_uses_requested_numeric_code_when_page_lacks_json_ld():
+    """Pages without JSON-LD expose only the non-numeric reference; the requested id must still resolve."""
+    from scripts.client.parsers import PropertyDetailParser
+
+    html = '<html><body><h1>Apartamento para Locação</h1><div class="info__col">Ref: IMO836</div></body></html>'
+    detail = PropertyDetailParser().parse_detail_response(html, requested_code="3980012")
+
+    assert detail.listing.code() == "3980012"
+    assert detail.listing.details.media.public_link.url_path == "/imovel/3980012"

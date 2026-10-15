@@ -59,7 +59,7 @@ class NiltonRentalProvider(RentalProviderProtocol):
         if final_url.endswith("niltoncorretordeimoveis.com.br"):
             raise PropertyNotFoundException(f"Property '{code_str}' was not found.")
         parser = PropertyDetailParser(public_base_url=self._builder.public_base_url())
-        return parser.parse_detail_response(resp.text)
+        return parser.parse_detail_response(resp.text, requested_code=code_str)
 
     def get_facets(self) -> FacetCollection:
         """Retrieve available cities, neighborhoods, and filter options."""

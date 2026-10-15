@@ -33,11 +33,15 @@ class PropertyDetailParser:
         """Configure the public base for the documented property detail route."""
         self._public_base_url = public_base_url
 
-    def parse_detail_response(self, html_text: str) -> RentalPropertyDetail:
-        """Parse property detail markup and return domain entity."""
+    def parse_detail_response(self, html_text: str, requested_code: str = "") -> RentalPropertyDetail:
+        """Parse property detail markup and return domain entity.
+
+        The requested numeric code takes precedence because detail pages without
+        JSON-LD only expose the non-numeric reference (e.g. ``IMO836``).
+        """
         soup = BeautifulSoup(html_text, "html.parser")
         ld_data = self._extract_json_ld(soup)
-        code_str = self._extract_code(soup, ld_data)
+        code_str = requested_code or self._extract_code(soup, ld_data)
         public_link = self._detail_public_link(code_str)
         title = self._extract_title(soup)
         price_val = self._extract_price(soup, ld_data)
